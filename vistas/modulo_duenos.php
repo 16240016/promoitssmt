@@ -116,7 +116,7 @@ else
 									</div>
 								</form>
 							</div>
-							<!--Fin Formulario Datos personales-->
+							<!--Fin Formulario Datos personales prueba-->
 							<!--Formulario Información del negocio-->
 							<div id="seccion2">
 								<h4 class="card-header text-center">Información del negocio</h4>
