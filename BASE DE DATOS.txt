@@ -1,0 +1,219 @@
+CREATE DATABASE promo_itssmt;
+USE promo_itssmt
+
+CREATE TABLE usuarios(idusuario INT PRIMARY KEY AUTO_INCREMENT, 
+n_usuario VARCHAR(15),
+c_usuario VARCHAR(15),
+estado VARCHAR(15))
+ENGINE=INNODB;
+
+CREATE TABLE datos_personales(idpersonal INT PRIMARY KEY AUTO_INCREMENT,
+idusuario INT,
+nombres VARCHAR(20),
+a_paterno VARCHAR(20),
+a_materno VARCHAR(20),
+rfc_usuario VARCHAR(13),
+n_telefono VARCHAR(15),
+correo_usu VARCHAR(30),
+FOREIGN KEY(idusuario) REFERENCES usuarios(idusuario)
+ON DELETE CASCADE ON UPDATE CASCADE)
+ENGINE=INNODB;
+
+CREATE TABLE localidad(idlocalidad INT PRIMARY KEY AUTO_INCREMENT,
+codigo_p VARCHAR(5),
+n_localidad VARCHAR(45))
+ENGINE=INNODB;
+
+CREATE TABLE t_pago(idpago INT PRIMARY KEY AUTO_INCREMENT,
+tipo_pago VARCHAR(45))
+ENGINE=INNODB;
+
+CREATE TABLE giro(idgiro INT PRIMARY KEY AUTO_INCREMENT,
+n_giro VARCHAR(200),
+d_giro VARCHAR(250),
+c_giro VARCHAR(9))
+ENGINE=INNODB;
+
+CREATE TABLE info_negocio(idinfo_negocio INT PRIMARY KEY AUTO_INCREMENT,
+idpersonal INT,
+idgiro INT,
+n_negocio VARCHAR(45),
+ref_negocio VARCHAR(45),
+rfc_negocio VARCHAR(13),
+url_imagen1 VARCHAR(100),
+url_imagen2 VARCHAR(100),
+tipo_negocio VARCHAR(15),
+tipo_servicio VARCHAR(25),
+FOREIGN KEY(idpersonal) REFERENCES datos_personales(idpersonal)
+ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(idgiro) REFERENCES giro(idgiro) 
+ON DELETE CASCADE ON UPDATE CASCADE)
+ENGINE=INNODB;
+
+CREATE TABLE redes_sociales(idredes_sociales INT PRIMARY KEY AUTO_INCREMENT,
+idinfo_negocio INT,
+correo_n VARCHAR(45),
+num_local VARCHAR(10),
+num_whats VARCHAR(10),
+dir_face VARCHAR(100),
+dir_twiter VARCHAR(100),
+FOREIGN KEY(idinfo_negocio) REFERENCES info_negocio(idinfo_negocio) 
+ON DELETE CASCADE ON UPDATE CASCADE)
+ENGINE=INNODB;
+
+CREATE TABLE productos(idproductos INT PRIMARY KEY AUTO_INCREMENT,
+idinfo_negocio INT,
+n_producto VARCHAR(45),
+m_producto VARCHAR(45),
+FOREIGN KEY(idinfo_negocio) REFERENCES info_negocio(idinfo_negocio) 
+ON DELETE CASCADE ON UPDATE CASCADE)
+ENGINE=INNODB;
+
+CREATE TABLE servicios(idservicio INT PRIMARY KEY AUTO_INCREMENT,
+idinfo_negocio INT,
+n_servicio VARCHAR(45),
+d_servicio VARCHAR(100),
+FOREIGN KEY(idinfo_negocio) REFERENCES info_negocio(idinfo_negocio) 
+ON DELETE CASCADE ON UPDATE CASCADE)
+ENGINE=INNODB;
+
+CREATE TABLE negocio_pago(idnegocio_pago INT PRIMARY KEY AUTO_INCREMENT,
+idpago INT,
+idinfo_negocio INT,
+FOREIGN KEY(idpago) REFERENCES t_pago(idpago) 
+ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(idinfo_negocio) REFERENCES info_negocio(idinfo_negocio) 
+ON DELETE CASCADE ON UPDATE CASCADE)
+ENGINE=INNODB;
+
+CREATE TABLE direccion(iddireccion INT PRIMARY KEY AUTO_INCREMENT,
+idinfo_negocio INT,
+idlocalidad INT,
+calle VARCHAR(45),
+numero VARCHAR(10),
+estado VARCHAR(25),
+municipio VARCHAR(45),
+FOREIGN KEY(idinfo_negocio) REFERENCES info_negocio(idinfo_negocio) 
+ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(idlocalidad) REFERENCES localidad(idlocalidad) 
+ON DELETE CASCADE ON UPDATE CASCADE)
+ENGINE=INNODB;
+
+CREATE TABLE dias_horario(iddias_horario INT PRIMARY KEY AUTO_INCREMENT,
+idinfo_negocio INT,
+he_lun VARCHAR(15),
+hc_lun VARCHAR(15),
+hs_lun VARCHAR(15),
+he_mar VARCHAR(15),
+hc_mar VARCHAR(15),
+hs_mar VARCHAR(15),
+he_mie VARCHAR(15),
+hc_mie VARCHAR(15),
+hs_mie VARCHAR(15),
+he_jue VARCHAR(15),
+hc_jue VARCHAR(15),
+hs_jue VARCHAR(15),
+he_vie VARCHAR(15),
+hc_vie VARCHAR(15),
+hs_vie VARCHAR(15),
+he_sab VARCHAR(15),
+hc_sab VARCHAR(15),
+hs_sab VARCHAR(15),
+he_dom VARCHAR(15),
+hc_dom VARCHAR(15),
+hs_dom VARCHAR(15),
+FOREIGN KEY(idinfo_negocio) REFERENCES info_negocio(idinfo_negocio) 
+ON DELETE CASCADE ON UPDATE CASCADE)
+ENGINE=INNODB;
+
+//////
+CREATE TABLE dias(iddia INT PRIMARY KEY AUTO_INCREMENT,
+n_dia VARCHAR(9))
+ENGINE=INNODB;
+
+CREATE TABLE horarios(idhorarios INT PRIMARY KEY AUTO_INCREMENT,
+iddia INT,
+idinfo_negocio INT,
+he TIME,
+hc TIME,
+hs TIME,
+FOREIGN KEY(iddia) REFERENCES dias(iddia)
+ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(idinfo_negocio) REFERENCES info_negocio(idinfo_negocio) 
+ON DELETE CASCADE ON UPDATE CASCADE)
+ENGINE=INNODB;
+///////
+
+
+PROCEDIMIENTO ALMACENADO PARA INSERTAR EL idusuario EN LA TABLA datos_personales
+
+DELIMITER //
+CREATE PROCEDURE insertIdusuario()
+BEGIN
+DECLARE id_U INT;
+SET id_U = (SELECT idusuario FROM usuarios ORDER BY idusuario DESC LIMIT 1);
+INSERT INTO datos_personales(idusuario) VALUES(id_U);
+END //
+
+DELIMITER //
+CREATE TRIGGER insertIdusuarioTrigger AFTER INSERT ON usuarios
+FOR EACH ROW
+CALL insertIdusuario();
+END //
+
+PROCEDIMIENTO ALMACENADO PARA INSERTAR EL idpesonal EN LA TABLA info_negocio
+
+DELIMITER //
+CREATE PROCEDURE insertIdpersonal()
+BEGIN
+DECLARE id_P INT;
+SET id_P = (SELECT idpersonal FROM datos_personales ORDER BY idpersonal DESC LIMIT 1);
+INSERT INTO info_negocio(idpersonal) VALUES(id_P);
+END //
+
+DELIMITER //
+CREATE TRIGGER insertIdpersonalTrigger AFTER INSERT ON datos_personales
+FOR EACH ROW
+CALL insertIdpersonal();
+END //
+
+PROCEDIMIENTO ALMACENADO PARA INSERTAR EL idinfo_negocio EN LA TABLA direccion Y EN redes_sociales
+
+DELIMITER //
+CREATE PROCEDURE insertIdinfonegocio()
+BEGIN
+DECLARE id_P INT;
+SET id_P = (SELECT idinfo_negocio FROM info_negocio ORDER BY idinfo_negocio DESC LIMIT 1);
+INSERT INTO direccion(idinfo_negocio) VALUES(id_P);
+INSERT INTO redes_sociales(idinfo_negocio) VALUES(id_P);
+INSERT INTO dias_horario(idinfo_negocio) VALUES(id_P);
+END //
+
+DELIMITER //
+CREATE TRIGGER insertIdinfonegocioTrigger AFTER INSERT ON info_negocio
+FOR EACH ROW
+CALL insertIdinfonegocio();
+END //
+
+
+//Consulta para combinar productos y servicios
+
+SELECT nombre, descripcion, negocio, direccion, telefono FROM (
+SELECT p.n_producto AS nombre, p.m_producto AS descripcion, i.n_negocio AS negocio, 
+CONCAT(d.calle,' ',d.numero,', ',l.n_localidad,', ',l.codigo_p,', ',d.municipio,', ',d.estado) AS direccion, 
+r.num_local AS telefono
+FROM localidad AS l JOIN direccion AS d ON l.idlocalidad=d.idlocalidad JOIN 
+info_negocio AS i ON d.idinfo_negocio=i.idinfo_negocio JOIN 
+redes_sociales AS r ON i.idinfo_negocio=r.idinfo_negocio JOIN 
+productos AS p ON r.idinfo_negocio=p.idinfo_negocio
+
+UNION ALL
+
+SELECT s.n_servicio AS nombre, s.d_servicio AS descripcion, i.n_negocio AS negocio, 
+CONCAT(d.calle,' ',d.numero,', ',l.n_localidad,', ',l.codigo_p,', ',d.municipio,', ',d.estado) AS direccion, 
+r.num_local AS telefono
+FROM localidad AS l JOIN direccion AS d ON l.idlocalidad=d.idlocalidad JOIN 
+info_negocio AS i ON d.idinfo_negocio=i.idinfo_negocio JOIN 
+redes_sociales AS r ON i.idinfo_negocio=r.idinfo_negocio JOIN 
+servicios AS s ON r.idinfo_negocio=s.idinfo_negocio) cosas
+ORDER BY nombre

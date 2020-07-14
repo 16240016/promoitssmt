@@ -1,0 +1,49 @@
+/*#formulario{
+  position: absolute; 
+  left: 410px;
+  top: 80px;
+  width: 40%; 
+  height: 20%;
+  animation-duration: 1.500s
+  
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  transition: all .5s;
+}
+
+#selectProductos, #selectServicios{
+	text-align: center;
+	border: none;
+}
+
+#imgNegocio{
+	width: 20%;
+	height: 100%;
+	display: block;
+	margin: auto;
+	float: left;
+	padding: 10px;
+}
+
+#imgNegocio img{
+	margin: auto;
+}
+
+#cuerpo_card{
+	width: 80%;
+	height: 100%;
+	float: right;
+}
+*/
+.card {
+  /*padding-top: 1%;*/
+  margin: 0 auto; /* Added */
+  float: none; /* Added */
+  margin-bottom: 100px; /* Added */
+}
+
